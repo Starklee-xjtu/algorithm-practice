@@ -1,0 +1,543 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% An example of a lab report write-up.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% This is a combination of several labs that I have done in the past for
+% Computer Engineering, so it is not to be taken literally, but instead used as
+% a great starting template for your own lab write up.  When creating this
+% template, I tried to keep in mind all of the functions and functionality of
+% LaTeX that I spent a lot of time researching and using in my lab reports and
+% include them here so that it is fairly easy for students first learning LaTeX
+% to jump on in and get immediate results.  However, I do assume that the
+% person using this guide has already created at least a "Hello World" PDF
+% document using LaTeX (which means it's installed and ready to go).
+%
+% My preference for developing in LaTeX is to use the LaTeX Plugin for gedit in
+% Linux.  There are others for Mac and Windows as well (particularly MikTeX).
+% Another excellent plugin is the Calc2LaTeX plugin for the OpenOffice suite.
+% It makes it very easy to create a large table very quickly.
+%
+% Professors have different tastes for how they want the lab write-ups done, so
+% check with the section layout for your class and create a template file for
+% each class (my recommendation).
+%
+% Also, there is a list of common commands at the bottom of this document.  Use
+% these as a quick reference.  If you'd like more, you can view the "LaTeX Cheat
+% Sheet.pdf" included with this template material.
+%
+% (c) 2009 Derek R. Hildreth <derek@derekhildreth.com> http://www.derekhildreth.com
+% This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike License. To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/1.0/ or send a letter to Creative Commons, 559 Nathan Abbott Way, Stanford, California 94305, USA.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\input kvmacros % For Karnaugh Maps (K-Maps)
+\documentclass[UTF8]{ctexart}
+\usepackage{graphicx} % For images
+\usepackage{float}    % For tables and other floats
+\usepackage{verbatim} % For comments and other
+\usepackage{amsmath}  % For math
+\usepackage{amssymb}  % For more math
+\usepackage{fullpage} % Set margins and place page numbers at bottom center
+\usepackage{listings} % For source code
+\usepackage{subfig}   % For subfigures
+\usepackage[usenames,dvipsnames]{color} % For colors and names
+\usepackage{hyperref}           % For hyperlinks and indexing the PDF
+\hypersetup{ % play with the different link colors here
+    colorlinks,
+    citecolor=blue,
+    filecolor=blue,
+    linkcolor=blue,
+    urlcolor=blue % set to black to prevent printing blue links
+}
+
+\definecolor{mygrey}{gray}{.96} % Light Grey
+\lstset{
+	language=[ISO]C++,              % choose the language of the code ("language=Verilog" is popular as well)
+   tabsize=3,							  % sets the size of the tabs in spaces (1 Tab is replaced with 3 spaces)
+	basicstyle=\tiny,               % the size of the fonts that are used for the code
+	numbers=left,                   % where to put the line-numbers
+	numberstyle=\tiny,              % the size of the fonts that are used for the line-numbers
+	stepnumber=2,                   % the step between two line-numbers. If it's 1 each line will be numbered
+	numbersep=5pt,                  % how far the line-numbers are from the code
+	backgroundcolor=\color{mygrey}, % choose the background color. You must add \usepackage{color}
+	%showspaces=false,              % show spaces adding particular underscores
+	%showstringspaces=false,        % underline spaces within strings
+	%showtabs=false,                % show tabs within strings adding particular underscores
+	frame=single,	                 % adds a frame around the code
+	tabsize=3,	                    % sets default tabsize to 2 spaces
+	captionpos=b,                   % sets the caption-position to bottom
+	breaklines=true,                % sets automatic line breaking
+	breakatwhitespace=false,        % sets if automatic breaks should only happen at whitespace
+	%escapeinside={\%*}{*)},        % if you want to add a comment within your code
+	commentstyle=\color{BrickRed}   % sets the comment style
+}
+
+% Make units a little nicer looking and faster to type
+\newcommand{\Hz}{\textsl{Hz}}
+\newcommand{\KHz}{\textsl{KHz}}
+\newcommand{\MHz}{\textsl{MHz}}
+\newcommand{\GHz}{\textsl{GHz}}
+\newcommand{\ns}{\textsl{ns}}
+\newcommand{\ms}{\textsl{ms}}
+\newcommand{\s}{\textsl{s}}
+
+
+
+% TITLE PAGE CONTENT %%%%%%%%%%%%%%%%%%%%%%%%
+% Remember to fill this section out for each
+% lab write-up.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\labtitle}{牛顿法，共轭梯度法。最速下降法比较}
+\newcommand{\authorname}{李梓铉}
+\newcommand{\professor}{阮小娥教授}
+\newcommand{\classno}{3118103163}
+% END TITLE PAGE CONTENT %%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}  % START THE DOCUMENT!
+
+
+% TITLE PAGE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% If you'd like to change the content of this,
+% do it in the "TITLE PAGE CONTENT" directly above
+% this message
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{titlepage}
+\begin{center}
+{\LARGE \textsc{最优化方法：} \\ \vspace{4pt}}
+{\Large \textsc{\labtitle} \\ \vspace{4pt}}
+\rule[13pt]{\textwidth}{1pt} \\ \vspace{150pt}
+{\large  \authorname \\ \vspace{10pt}
+学号 \classno\\ \vspace{10pt}
+指导老师: \professor \\ \vspace{10pt}
+\today}
+\end{center}
+\end{titlepage}
+% END TITLE PAGE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{问题简介}
+%No Text Here
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Find the minimizer of the higher-dimensional quadratic optimization for  the respective consistent convex, bounded convex and convex  cases with different initial points by any 3 methods of conjugate gradient method, steepest descent method, Newton’s method and Quasi Newton method.
+
+\section{方法}
+\subsection{生成三种情况下的凸优化问题}
+\begin{comment}
+This is a lab template which has a ton of different things which are useful in writing lab write-ups in the Computer Eningeering field.  This is demonstrating the comment block. Don't be overwhelmed, it may seem like a lot to take in at a time, but it's worth spending the time learning it.
+\end{comment}
+对于二次型优化问题 $\min f(x)=\frac{1}{2} x^{\mathrm{T}} A x-b^{\mathrm{T}} x$ 根据consistent convex的定义，构造一个hessin阵为实对称正定的即满足一致连续的定义。
+\vspace{3mm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+首先设计生成一个随机的实对称正定矩阵的算法
+算法的主要过程总结如下：
+\begin{enumerate}
+	\item 生成一个随机对角阵diag(rand（N,1）)
+	\item 生成一个随机的矩阵B(N,N)
+	\item 求矩阵B的正交基U
+	\item 得到随机实对称正定矩阵A=U'*D*U
+\end{enumerate}
+
+在实对称的基础上，构造半正定实对称阵实现第二种情况convex，只需要将A减去A的最小特征值大小的对角阵，即可得到有特征值为0的半正定convex。
+
+算法的主要过程总结如下：
+\begin{enumerate}
+	\item 生成一个随机对角阵diag(rand（N,1）)
+	\item 生成一个随机的矩阵B(N,N)
+	\item 求矩阵B的正交基U
+	\item 得到随机实对称正定矩阵A=U'*D*U
+  \item 得到实对称半正定矩阵A=A-max(lam)*eye
+\end{enumerate}
+
+类似的可以得到bounded convex的情况，只需得到不定hessian矩阵的f（x）
+算法的主要过程总结如下：
+\begin{enumerate}
+	\item 生成一个随机对角阵diag(rand（N,1）)
+	\item 生成一个随机的矩阵B(N,N)
+	\item 求矩阵B的正交基U
+	\item 得到随机实对称正定矩阵A=U'*D*U
+  \item 得到实对称半正定矩阵A=A-（max(lam)+min(lam))/2*eye
+\end{enumerate}
+
+可证明对于实对称正定矩阵A的最优化问题$minf(x)=\frac{1}{2} x^{\mathrm{T}} A x-b^{\mathrm{T}} x$,解即为方程$A x=b$的解。 因此为了方便检验算法的精确性，设最优解为元素均为1的向量，根据方程$A x=b$求出b。
+
+\subsection{共轭梯度法}
+对于最优化问题$\min f(x)=\frac{1}{2} x^{\mathrm{T}} A x-b^{\mathrm{T}} x$
+使用共轭梯度法，可证明在问题的一组正交方向上进行精确线搜索即可在有限步迭代后得到极小值。证明可得以下迭代公式
+\begin{enumerate}
+	\item 优化方向$d^{(k)}=r^{(k)}-\frac{r^{(k) T} A d^{(0)}}{d^{(0) T} A d^{(0)}} d^{(0)}-\cdots-\frac{r^{(k) T} A d^{(k-1)}}{d^{(k-1) T} A d^{(k-1)}} d^{(k-1)}$
+	\item 优化步长$\alpha_{k}=\frac{r^{(k) \mathrm{T}} d^{(k)}}{d^{(k) \mathrm{T}} A d^{(k)}}$
+	\item 迭代误差$r^{(k)}=b-A x^{(k)}$
+\end{enumerate}
+
+
+\subsection{最速下降法}
+最速下降法是梯度方法的一种实现，它的理念是在每次的迭代过程中，选取一个合适的步长，使得目标函数的值能够最大程度的减小。步长为$\alpha_{k}=\arg \min f\left(x^{(k)}-\alpha \nabla f\left(x^{(k)}\right)\right), \alpha \geq 0$
+在目标函数为二次型的情况下
+\begin{enumerate}
+	\item 优化方向$g^{(k)}=\nabla f\left(\boldsymbol{x}^{(k)}\right)=\boldsymbol{Q} \boldsymbol{x}^{(k)}-\boldsymbol{b}$
+	\item 优化步长$\alpha_{k}=\frac{g^{(k) T} g^{(k)}}{g^{(k) T} \boldsymbol{Q} g^{(k)}}$
+	\item 迭代公式$x^{(k+1)}=x^{(k)}-\frac{g^{(k) T} g^{(k)}}{g^{(k) T} \boldsymbol{Q} g^{(k)}} g(k)$
+\end{enumerate}
+
+
+\subsection{牛顿法}
+最速下降法只用到了函数的一阶导数，这种方法并不总是最高效的。而这里说的牛顿法用到了二阶导数，它的效率可能比最速下降法更优。应用局部极小点的一阶必要条件：$\mathbf{0}=\nabla q(\boldsymbol{x})=\boldsymbol{g}^{(k)}+\boldsymbol{F}\left(\boldsymbol{x}^{(k)}\right)\left(\boldsymbol{x}-\boldsymbol{x}^{(k)}\right)$
+
+如果hessian矩阵正定，可得函数的极小值点为：
+$\boldsymbol{x}^{(k+1)}=\boldsymbol{x}^{(k)}-\boldsymbol{F}\left(\boldsymbol{x}^{(k)}\right)^{-1} \boldsymbol{g}^{(k)}$
+
+
+
+\section{结果与讨论}
+
+\begin{figure}[H]
+下图是在距离最小点比较远的情况下，三种方法的收敛曲线
+  \centering
+  \label{fig:Per6A}\includegraphics[width=1\textwidth]{SDP.png}\
+  \caption{consistent convex（实对称正定）收敛曲线}
+  \label{fig:oscil}
+\end{figure}
+
+可以看出对于consistent convex，三种方法都可以计算收敛，其中牛顿法收敛最快，一步即可得到最优值点，梯度下降法醉眠，迭代次数远高于另外两种方法。
+
+\begin{figure}[H]
+  \centering
+  \label{fig:Per6A}\includegraphics[width=1\textwidth]{SSDP.png}\
+  \caption{convex（实对称半正定）收敛曲线}
+  \label{fig:oscil}
+\end{figure}
+
+可以看出对于一般的convex，三种方法都可以计算收敛，这时牛顿法的优势没有那么大了，共轭梯度法仍然保持了较快的速度，牛顿法与共轭梯度法都比梯度下降法表现除了极大的优势。
+
+
+\begin{figure}[H]
+  \centering
+  \label{fig:Per6A}\includegraphics[width=1\textwidth]{UD.png}\
+  \caption{bound convex（不定）收敛曲线}
+  \label{fig:oscil}
+\end{figure}
+
+对于bound convex，梯度下降法没有办法到达极小值点，陷入了局部极值点，而牛顿法仍然收敛了，可能是初始点距离目标极小值点比较近。
+
+总结来说，共轭梯度法是最稳定的算法，牛顿法会因为目标函数的hessin阵性质而影响收敛性，如果hessin是非正定的，那么牛顿法牛顿法的搜索方向并不一定是目标函数值的下降方向。而最速下降法由于只用到了一阶导数信息（不像共轭梯度用到了函数的阶数，牛顿法用到二阶导数信息），表现是三个算法中最差的。
+
+
+\section{源代码}
+使用python编写代码如下.  \vspace{5mm}
+	\lstinputlisting{conjugate_gradient.py}
+	\vspace{3mm}
+
+
+\end{document} % DONE WITH DOCUMENT!
+
+% IF YOU'D RATHER TYPE THE CODE, OR HAVE A SMALLER BLOCK OF CODE, USE THIS:
+%\begin{lstlisting}
+%if(something)
+%	do this
+%else
+%	do this
+%\end{lstlisting}
+
+%% THIS IS FROM A DIFFERENT CLASS, BUT DEMONSTRATES MATH MODE WELL
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Formulas and Overall Descriptions Used}
+This part of the laboratory was done for \href{http://www.byui.edu/catalog/2004-2005/class.asp1075.htm}{Feedback Control}.  Most of this laboratory's calculations were completed and compiled by the folks at Quanser (the manufacturer of the inverted pendulum) and will give the lab a good starting place.  Below are the state equation and gain values used initially in the lab:
+	\[
+	\begin{bmatrix}
+	\dot{\alpha} \\
+	\ddot{\alpha} \\
+	\dot{\theta} \\
+	\ddot{\theta} \\
+	\end{bmatrix}
+	=
+	\begin{bmatrix}
+	0 & 1 & 0 & 0 \\
+	81.7 & 0 & 0 & -13.9 \\
+	0 & 0 & 0 & 1 \\
+	39.7 & 0 & 0 & -14.4 \\
+	\end{bmatrix}
+	\begin{bmatrix}
+	\alpha \\
+	\dot{\alpha} \\
+	\theta \\
+	\dot{\theta} \\
+	\end{bmatrix}
+	+
+	\begin{bmatrix}
+	0 \\
+	24.5 \\
+	0 \\
+	25.4 \\
+	\end{bmatrix}
+	V
+	\]
+
+	\[
+	K  =
+	\begin{bmatrix}
+	21 & 2.8 & -2.2 & -2.0 \\
+	\end{bmatrix}
+	\]
+
+Other values, such as the $\frac{\mbox{Volts}}{\mbox{Degree}}$ and $\frac{\mbox{Degrees}}{\mbox{Volt}}$ were obtained by first determining the max angle of the pendulum on both extreme sides.
+
+Using the max angles from above, these values were determined:
+	\[
+	\begin{array}{l l}
+		\alpha = 0.062 \frac{\mbox{Volts}}{\mbox{Degree}} \\ \\
+		\alpha = 15.105 \frac{\mbox{Degrees}}{\mbox{Volt}} \\
+	\end{array}
+	\]
+
+I would also like to add that in order to calibrate $\alpha$ to get a perfect vertical $= 0$, a value of $0.09$ needed to be added.  The same applies to $\theta$ where $0.322$ needs to be added.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{DC Motor Transfer Function and Parameters}
+
+Definitions:
+	\begin{align*}
+		\theta(t) =  Angular Position \\
+		\dot{\theta}(t) =  Angular Velocity \\
+		\triangle t = t_{10\%} - t_{90\%} \\
+		90\% = e^{-t_{10\%}/\tau} \\
+		10\% = e^{-t_{90\%}/\tau} \\
+	\end{align*}
+
+The Math:
+	\begin{align*}
+		\frac{s\theta(s)}{V_{a}(s)} = \frac{K}{s+P} \\
+		\mbox{Let}\ V_{a}(s) = \frac{V_{0}}{s} \\  % If you'd like to have a space following any command, add "\" to the end as shown here.
+		s\theta(s) = \frac{KV_{0}}{(S+P)S} = \frac{KV_{0}}{\frac{P}{S}} - \frac{\frac{KV_{0}}{P}}{s+P} \\
+		L^{-1} \Rightarrow \dot{\theta}(t) = \frac{KV_{0}}{P}(1-e^{-t/(1/P)}) \\
+		\dot{\theta}(t) = (\dot{\theta}_{i} - \dot{\theta}_{f})e^{-pt} + \dot{\theta}_{f} \\
+	\end{align*}
+
+Final equations:
+	\begin{align}
+		\label{thetadot}\dot{\theta}_{f} = \frac{KV_{0}}{P} \\
+		\label{equ:tau}\frac{1}{P} = \tau = \frac{\triangle t}{ln(9)}
+	\end{align}
+
+Graphically (Refer to Equation \ref{thetadot} and Equation \ref{equ:tau}) :
+	% Drawn and exported to png using Inkscape.
+	\begin{figure}[h]
+		\begin{center}
+			\includegraphics[width=0.33\textwidth]{graph.png}
+		\end{center}
+	\label{graph}
+	\end{figure}
+
+% AGAIN, ANOTHER EXAMPLE FROM A DIFFERENT CLASS WHICH DEMONSTRasdATES KMAPS AND TABLES NICELY.
+\newpage % I added this after viewing the completed pdf and decided to make this cosmetic change
+This section consists of tables and reductions which were used in this laboratory exercise.
+
+% This table was generated using the Calc2LaTeX macro which I mentioned earlier.
+% You'll need OpenOffice installed and you'll have to download the macro online.
+% If you're interested, I have a guide on how to set this up and use it on my
+% blog.  http://www.derekhildreth.com/blog  Search for "LaTeX".  You'll find it.
+	\begin{table}[htbp]
+	\begin{center}
+		\begin{tabular}{|ccc|cc|}
+			\hline
+			\textbf{PS} & \textbf{D} & \textbf{N} & \textbf{NS} & \textbf{P} \\ \hline
+			\$0.00 & 0 & 0 & \$0.00 & 0 \\
+			 & 0 & 1 & \$0.05 & 0 \\
+			 & 1 & 0 & \$0.10 & 0 \\
+			 & 1 & 1 & -- & -- \\ \hline
+			\$0.05 & 0 & 0 & \$0.05 & 0 \\
+			 & 0 & 1 & \$0.10 & 0 \\
+			 & 1 & 0 & \$0.15 & 0 \\
+			 & 1 & 1 & -- & -- \\ \hline
+			\$0.10 & 0 & 0 & \$0.10 & 0 \\
+			 & 0 & 1 & \$0.15 & 0 \\
+			 & 1 & 0 & \$0.15 & 0 \\
+			 & 1 & 1 & -- & -- \\ \hline
+			\$0.15 & -- & -- & \$0.15 & 1 \\ \hline
+			\end{tabular}
+	\end{center}
+	\caption{Symbolic Transition Table}
+	\label{symbolic}
+	\end{table}
+
+	\begin{table}[H]
+		\centering
+		\subfloat[D1 = $Q_{1}$+D+$Q_{0}$N] % Caption
+			{
+				\karnaughmap{4}{D1:}{ {$Q_{1}$} {$Q_{0}$} {D} {N} }{001X011X111X111X}{}  % See the included kvdoc.pdf file for more details
+			} \hspace{10mm} % seperate them a bit
+		\subfloat[D0 = $\Bar{Q_{0}}$N + $Q_{0}\Bar{N}$ + $Q_{1}$N + $Q_{1}$D] % Caption
+			{
+				\karnaughmap{4}{D0:}{ {$Q_{1}$} {$Q_{0}$} {D} {N} }{010X101X011X111X}{}
+			}
+	  \caption{Karnaugh maps and the simplified results of the logic.}
+	  \label{fig:kmaps}
+	\end{table}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{Discussion \& Conclusion}
+The goal of this lab was to re-design the LED/Switch system to include a hardware timer.  By pressing eight different combinations of the three buttons, the LEDs on the board were to act in different ways using these timers. There was not a Q\&A requirement for this lab. \vspace{3mm} % I use this to seperate the paragraphs a bit.
+
+I was able to accomplish the requirements of the lab by utilizing the \texttt{IntMgrTimerExample.c} project found within the analog devices example programs folder (and mentioned in the class lecture).  There were some stumbling blocks to overcome.  The most difficult for myself was actually getting the period of the LEDs just right.  I was able to get it very close to the 333.3\ms, 666.7\ms, and 1\s periods, but not exactly.  My first method of getting these periods right was to take the clock speed in \MHz, find the period by taking the inverse of the clock speed, and then solving for the value in hex that was needed to get the right period.  This didn't yeild very accurate results at all, and so I then went through a trial and error session until I got a value of 1.1\ms.  I used this value in hex to calculate the other periods.  The results of this method can be seen in Figure \ref{fig:oscil} above in the schematics section. \vspace{3mm}
+
+Another observation I would like to point out is that I put all of my logic within the interrupts themselves.  I feel that this was a hacked way of doing the lab to save time and that it's probably not the best programming method.  After I was completed with my lab, I viewed other students solutions and they just seemed more elegant.  Interestingly enough, the other students weren't incredibly happy with their solution either.  If I were to go back and do this lab again, I would invest more time in both understanding how to utilze the interrupts as well as find a more elegant solution to blink the lights. \vspace{3mm}
+
+All in all, this laboratory gave me an insight on how interrupts work and I hope to be able to apply them to following labs\ldots
+
+
+\end{document} % DONE WITH DOCUMENT!
+
+
+%%%%%%%%%%
+PERSONAL FAVORITE LAB WRITE-UP STRUCTURE
+%%%%%%%%%%
+\section{Introduction}
+	% No Text Here
+	\subsection{Purpose}
+		% Lab objective
+	\subsection{Equipment}
+		% Any and all equipment used (specific!)
+	\subsection{Procedure}
+		% Overview of the procedure taken (not-so-specific!)
+\newpage
+\section{Schematic Diagrams}
+	% Any schematics, screenshots, block
+   % diagrams used.  Possibly photos or
+	% images could go here as well.
+\newpage
+\section{Experiment Data}
+	% Depending on lab, program code would be
+	% included here without the Estimated and
+	% Actual Results.
+	\subsection{Estimated Results}
+		% Calculated. What it should be.
+	\subsection{Actual Results}
+		% Measured.  What it actually was.
+\newpage
+\section{Discussion \& Conclusion}
+	% 3 Paragraphs:
+		% Restate the objective of the lab
+		% Discuss personal trials, errors, and difficulties
+		% Conclude the lab
+
+
+%%%%%%%%%%%%%%%%
+COMMON COMMANDS:
+%%%%%%%%%%%%%%%%
+% IMAGES
+begin{figure}[H]
+   \begin{center}
+      \includegraphics[width=0.6\textwidth]{RTL_SCHEM.png}
+   \end{center}
+\caption{A screenshot of the RTL Schematics produced from the Verilog code.}
+\label{RTL}
+\end{figure}
+
+% SUBFIGURES IMAGES
+\begin{figure}[H]
+  \centering
+  \subfloat[LED4 Period]{\label{fig:Per4}\includegraphics[width=0.4\textwidth]{period_led4.png}} \\
+  \subfloat[LED5 Period]{\label{fig:Per5}\includegraphics[width=0.4\textwidth]{period_led5.png}}
+  \subfloat[LED6 Period]{\label{fig:Per6}\includegraphics[width=0.4\textwidth]{period_led6.png}}
+  \caption{Period of LED blink rate captured by osciliscope.}
+  \label{fig:oscil}
+\end{figure}
+
+% INSERT SOURCE CODE
+\lstset{language=Verilog, tabsize=3, backgroundcolor=\color{mygrey}, basicstyle=\small, commentstyle=\color{BrickRed}}
+\lstinputlisting{MODULE.v}
+
+% TEXT TABLE
+\begin{table}
+\begin{center}
+\begin{tabular}{|l|c|c|l|}
+	x & x & x & x \\ \hline
+	x & x & x & x \\
+	x & x & x & x \\ \hline
+\end{tabular}
+\caption{Caption}
+\label{label}
+\end{center}
+\end{table}
+
+% MATHMATICAL ENVIRONMENT
+$ 8 = 2 \times 4 $
+
+% CENTERED FORMULA
+\[  \]
+
+% NUMBERED EQUATION
+\begin{equation}
+
+\end{equation}
+
+% ARRAY OF EQUATIONS (The splat supresses the numbering)
+\begin{align*}
+
+\end{align*}
+
+% NUMBERED ARRAY OF EQUATIONS
+\begin{align}
+
+\end{align}
+
+% ACCENTS
+\dot{x} % dot
+\ddot{x} % double dot
+\bar{x} % bar
+\tilde{x} % tilde
+\vec{x} % vector
+\hat{x} % hat
+\acute{x} % acute
+\grave{x} % grave
+\breve{x} % breve
+\check{x} % dot (cowboy hat)
+
+% FONTS
+\mathrm{text} % roman
+\mathsf{text} % sans serif
+\mathtt{text} % Typewriter
+\mathbb{text} % Blackboard bold
+\mathcal{text} % Caligraphy
+\mathfrak{text} % Fraktur
+
+\textbf{text} % bold
+\textit{text} % italic
+\textsl{text} % slanted
+\textsc{text} % small caps
+\texttt{text} % typewriter
+\underline{text} % underline
+\emph{text} % emphasized
+
+\begin{tiny}text\end{tiny} % Tiny
+\begin{scriptsize}text\end{scriptsize} % Script Size
+\begin{footnotesize}text\end{footnotesize} % Footnote Size
+\begin{small}text\end{small} % Small
+\begin{normalsize}text\end{normalsize} % Normal Size
+\begin{large}text\end{large} % Large
+\begin{Large}text\end{Large} % Larger
+\begin{LARGE}text\end{LARGE} % Very Large
+\begin{huge}text\end{huge}   % Huge
+\begin{Huge}text\end{Huge}   % Very Huge
+
+
+% GENERATE TABLE OF CONTENTS AND/OR TABLE OF FIGURES
+% These seem to have some issues with the "revtex4" document class.  To use, change
+% the very first line of this document to "article" like this:
+% \documentclass[aps,letterpaper,10pt]{article}
+\tableofcontents
+\listoffigures
+\listoftables
+
+% INCLUDE A HYPERLINK OR URL
+\url{http://www.derekhildreth.com}
+\href{http://www.derekhildreth.com}{Derek Hildreth's Website}
+
+% FOR MORE, REFER TO THE "LINUX CHEAT SHEET.PDF" FILE INCLUDED!
